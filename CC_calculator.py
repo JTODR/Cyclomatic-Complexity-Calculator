@@ -4,31 +4,51 @@ from radon.cli.harvest import CCHarvester
 from radon.cli import Config
 
 
-cc_path = 'C:\\Users\\Joseph\\Documents\\College\\4th Year\\CS4400_IntApps\\File_System_Project\\github_repo\\client_lib.py'
-cc_config = Config(
-	exclude='',
-	ignore='venv',
-	order=SCORE,
-	no_assert=True,
-	show_closures=False,
-	min='A',
-	max='F',
-)
+def calc_CC(filename, cc_config):
+	file = open(filename, 'r')
+
+	results = CCHarvester(filename, cc_config).gobble(file)
+
+	file_cc = 0
+
+	for i in results:
+		print (i.complexity)
+		file_cc += int(i.complexity)
+
+	avg_cc = file_cc/ len(results)
+	print("Total complexity of file: " + str(file_cc))
+	print("Average complexity of file: " + str(avg_cc))
+	return file_cc
+
+def main():
+	path_list = ['C:\\Users\\Joseph\\Documents\\College\\4th Year\\CS4400_IntApps\\File_System_Project\\github_repo\\client_lib.py',
+	'C:\\Users\\Joseph\\Documents\\College\\4th Year\\CS4400_IntApps\\File_System_Project\\github_repo\\client.py',
+	'C:\\Users\\Joseph\\Documents\\College\\4th Year\\CS4400_IntApps\\File_System_Project\\github_repo\\locking_service.py',
+	'C:\\Users\\Joseph\\Documents\\College\\4th Year\\CS4400_IntApps\\File_System_Project\\github_repo\\file_server.py',
+	'C:\\Users\\Joseph\\Documents\\College\\4th Year\\CS4400_IntApps\\File_System_Project\\github_repo\\directory_service.py']
 
 
-file = open(cc_path, 'r')
+	cc_config = Config(
+		exclude='',
+		ignore='venv',
+		order=SCORE,
+		no_assert=True,
+		show_closures=False,
+		min='A',
+		max='F',
+	)
 
-results = CCHarvester(cc_path, cc_config).gobble(file)
+	total_cc = 0
 
-total_cc = 0
-
-for i in results:
-	print (i.complexity)
-	total_cc += int(i.complexity)
-
-avg_cc = total_cc/ len(results)
-print("Total complexity of file: " + str(total_cc))
-print("Average complexity of file: " + str(avg_cc))
+	for path in path_list:
+		file_cc = calc_CC(path, cc_config)
+		total_cc += file_cc
+	
+	avg_cc = total_cc/ len(path_list)
+	print("Total complexity of all file: " + str(total_cc))
+	print("Average CC of all files: " + str(avg_cc))
 
 
+if __name__ == "__main__":
+    main()
 
