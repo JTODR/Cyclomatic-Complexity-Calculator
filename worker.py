@@ -3,26 +3,58 @@ import os
 from radon.complexity import SCORE
 from radon.cli.harvest import CCHarvester
 from radon.cli import Config
+import requests
+from collections import deque
+import shutil
+from time import gmtime, strftime
+import os.path
+import sys
+
+def get_filename(raw_url):
+
+	#'https://github.com/JTODR/Chat-Server-Project/raw/157f5205798d9e1d49dff5599dfba8cb092c9191/README.md'
+	sha_filename = raw_url.split('raw')[1]
+	filename = sha_filename.split('/')[2]
+	return filename
+
+def calc_CC(raw_url, cc_config):
+	#file = open(filename, 'r')
+
+	filename = get_filename(raw_url)
+	if filename.split('.')[1] != 'py':
+		return -1
 
 
-def calc_CC(filename, cc_config):
-	file = open(filename, 'r')
+	resp = requests.get(raw_url)
+	#print(resp.text)
+	filename = strftime("%Y%m%d%H%M%S", gmtime())
+	filename = filename + '.py'
+	#filename = ".\\temp\\" + filename + ".py"
 
-	results = CCHarvester(filename, cc_config).gobble(file)
+	curr_path = os.path.dirname(os.path.realpath(sys.argv[0]))      # get path of current program 
+	file_path = curr_path + '\\temp\\' + filename     
+	with open(file_path, 'w') as tmp_file:
+		tmp_file.write(resp.text)
+	tmp_file.close()
 
+	CC_file_get = open(file_path, 'r')
+	results = CCHarvester(file_path, cc_config).gobble(CC_file_get)
+	CC_file_get.close()
 	file_cc = 0
 
 	for i in results:
 		print (i.complexity)
 		file_cc += int(i.complexity)
 
-	avg_cc = file_cc/ len(results)
-	print("Total complexity of file: " + str(file_cc))
-	print("Average complexity of file: " + str(avg_cc))
-	return avg_cc
+	#avg_cc = file_cc/ len(results)
+	print("Complexity of file: " + str(file_cc))
+	#print("Average complexity of file: " + str(avg_cc))
+	return file_cc
 
 def main():
 	
+	print("Worker is ready to receive...")
+
 	cc_config = Config(
 		exclude='',
 		ignore='venv',
@@ -35,18 +67,21 @@ def main():
 
 	CC_socket = socket(AF_INET, SOCK_STREAM)
 	serverName = 'localhost'
-	serverPort = 1234  
+	serverPort = 1598  
 	CC_socket.bind(('', serverPort))
 	CC_socket.listen(1)
 
 	while True:
 		connectionSocket, addr = CC_socket.accept()
-		path = connectionSocket.recv(1024)
-		path = path.decode()
+		raw_url = connectionSocket.recv(1024)
+		raw_url = raw_url.decode()
 
-		avg_cc = calc_CC(path, cc_config)
-		avg_cc = str(avg_cc)
-		connectionSocket.send(avg_cc.encode())
+		print("RECEIVED: " + raw_url)
+
+		file_cc = calc_CC(raw_url, cc_config)
+		
+		file_cc = str(file_cc)
+		connectionSocket.send(file_cc.encode())
 
 	connectionSocket.close()
 
