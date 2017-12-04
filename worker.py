@@ -4,21 +4,30 @@ from radon.complexity import SCORE
 from radon.cli.harvest import CCHarvester
 from radon.cli import Config
 import requests
-from collections import deque
-import shutil
 from time import gmtime, strftime
 import os.path
 import sys
+import shutil
+
+
+cc_config = Config(
+		exclude='',
+		ignore='venv',
+		order=SCORE,
+		no_assert=True,
+		show_closures=False,
+		min='A',
+		max='F',
+)
+
 
 def get_filename(raw_url):
 
-	#'https://github.com/JTODR/Chat-Server-Project/raw/157f5205798d9e1d49dff5599dfba8cb092c9191/README.md'
 	sha_filename = raw_url.split('raw')[1]
 	filename = sha_filename.split('/')[2]
 	return filename
 
 def calc_CC(raw_url, cc_config):
-	#file = open(filename, 'r')
 
 	filename = get_filename(raw_url)
 	if filename.split('.')[1] != 'py':
@@ -26,13 +35,10 @@ def calc_CC(raw_url, cc_config):
 
 
 	resp = requests.get(raw_url)
-	#print(resp.text)
-	filename = strftime("%Y%m%d%H%M%S", gmtime())
-	filename = filename + '.py'
-	#filename = ".\\temp\\" + filename + ".py"
 
-	curr_path = os.path.dirname(os.path.realpath(sys.argv[0]))      # get path of current program 
-	file_path = curr_path + '\\temp\\' + filename     
+	filename = strftime("%Y%m%d%H%M%S", gmtime()) + '.py'
+
+	file_path = filename    
 	with open(file_path, 'w') as tmp_file:
 		tmp_file.write(resp.text)
 	tmp_file.close()
@@ -40,6 +46,8 @@ def calc_CC(raw_url, cc_config):
 	CC_file_get = open(file_path, 'r')
 	results = CCHarvester(file_path, cc_config).gobble(CC_file_get)
 	CC_file_get.close()
+	os.remove(file_path)
+
 	file_cc = 0
 
 	for i in results:
@@ -51,19 +59,7 @@ def calc_CC(raw_url, cc_config):
 	#print("Average complexity of file: " + str(avg_cc))
 	return file_cc
 
-def main():
-	
-	print("Worker is ready to receive...")
-
-	cc_config = Config(
-		exclude='',
-		ignore='venv',
-		order=SCORE,
-		no_assert=True,
-		show_closures=False,
-		min='A',
-		max='F',
-	)
+def receive_work():
 
 	CC_socket = socket(AF_INET, SOCK_STREAM)
 	serverName = 'localhost'
@@ -86,6 +82,10 @@ def main():
 	connectionSocket.close()
 
 
+def main():
+
+	print("Worker is ready to receive...")
+	receive_work()
+
 if __name__ == "__main__":
 	main()
-
