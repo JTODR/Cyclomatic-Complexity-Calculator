@@ -76,10 +76,10 @@ def main():
 
     github_url = 'https://api.github.com/repos/JTODR/Cyclomatic-Complexity-Calculator/commits'
    
-    print("Getting SHA list...")
+    print("Getting Tree URL list...")
     tree_urls = get_tree_urls(github_url)      # get the list of tree URL's from the project's commits
-    print("SHA list received...")
-    print("Gettng raw URL's...")
+    print("Tree URL list received...")
+    print("Gettng blob URL's...")
     blob_url_list = get_blob_url_list(github_url, tree_urls)    # get blob URLs of each tree's 
     #print (raw_url_list)
     #blob_url_list = ['https://api.github.com/repos/geekcomputers/Python/git/blobs/b92c525955a1a4ef80cfad2564db957d78716996|4 Digit Number Combinations.py', 'https://api.github.com/repos/geekcomputers/Python/git/blobs/90ba62afc956f576c5832d571a4c85188d817fac|CountMillionCharacter.py', 'https://api.github.com/repos/geekcomputers/Python/git/blobs/47482ba68585483023372e3999e1927ac25c7991|CountMillionCharacters-2.0.py', 'https://api.github.com/repos/geekcomputers/Python/git/trees/273f0bab9e233ec1769be11c3125cecc15c7af93|CountMillionCharacters-Variations', 'https://api.github.com/repos/geekcomputers/Python/git/blobs/5d8c91b96191295eeb110c1dad5ecdc0514bad98|Cricket_score.py', 'https://api.github.com/repos/geekcomputers/Python/git/blobs/dbdc0aa1c88b1c67359abe18c362fb787729ab26|EncryptionTool.py', 'https://api.github.com/repos/geekcomputers/Python/git/trees/7883cb00218da1977239da0ef38c624511bc1c86|Google Image Downloader', 'https://api.github.com/repos/geekcomputers/Python/git/blobs/35fed53df4c43da9e63df6632ccac45c5ace72ee|Google_News.py', 'https://api.github.com/repos/geekcomputers/Python/git/blobs/586686d066848def5d273599180e54f23cca2170|GroupSms_Way2.py']

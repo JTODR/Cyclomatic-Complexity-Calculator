@@ -21,13 +21,6 @@ cc_config = Config(
         max='F',
 )
 
-
-def get_filename(raw_url):
-
-    sha_filename = raw_url.split('raw')[1]
-    filename = sha_filename.split('/')[2]
-    return filename
-
 def get__params_headers():
     with open('github-token.txt', 'r') as tmp_file:
         token = tmp_file.read()     # get the token from a text file in current directory
