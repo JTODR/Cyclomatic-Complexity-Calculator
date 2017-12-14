@@ -83,16 +83,8 @@ def receive_work():
 
     CC_socket.send(msg.encode())
 
-    '''
-    CC_socket = socket(AF_INET, SOCK_STREAM)
-    serverName = 'localhost'
-    serverPort = 1598  
-    CC_socket.bind(('', serverPort))
-    CC_socket.listen(1)
-    '''
-
     while True:
-        #connectionSocket, addr = CC_socket.accept()
+
         raw_url = CC_socket.recv(1024)
         raw_url = raw_url.decode()
 
