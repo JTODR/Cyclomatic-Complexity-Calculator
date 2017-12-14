@@ -11,108 +11,99 @@ import shutil
 
 from re import match
 
-cc_config = Config(
-        exclude='',
-        ignore='venv',
-        order=SCORE,
-        no_assert=True,
-        show_closures=False,
-        min='A',
-        max='F',
-)
-
-def get__params_headers():
-    with open('github-token.txt', 'r') as tmp_file:
-        token = tmp_file.read()     # get the token from a text file in current directory
-
-    payload = {'access_token': token}
-    headers = {'Accept': 'application/vnd.github.v3.raw'}
-
-    #print(token)
-    return (payload, headers)
 
 
-def check_py(filename):
-    return True if match('.*\.py', filename) is not None else False
+class Worker():
 
-def calc_CC(raw_url, cc_config):
+    master_url = 'http://localhost:2020/'
+    node_setup_url = 'http://localhost:2020/init'
 
-    blob_url = raw_url.split('|')[0]
-    filename = raw_url.split('|')[1]
+    cc_config = Config(
+            exclude='',
+            ignore='venv',
+            order=SCORE,
+            no_assert=True,
+            show_closures=False,
+            min='A',
+            max='F',
+    )
 
-    payload_headers = get__params_headers()
+    def __init__(self):
+        self.files_list_url = requests.get(self.master_url).json()#['url']
+        print(self.files_list_url)
 
-    flag = check_py(filename)
-    if flag == True:
+    def get__params_headers(self):
+        with open('github-token.txt', 'r') as tmp_file:
+            token = tmp_file.read()     # get the token from a text file in current directory
 
-        resp = requests.get(blob_url,   params=payload_headers[0], headers=payload_headers[1])
+        payload = {'access_token': token}
+        headers = {'Accept': 'application/vnd.github.v3.raw'}
 
-        file_path = filename
-
-        with open(file_path, 'w') as tmp_file:
-            tmp_file.write(resp.text)
-        tmp_file.close()
+        #print(token)
+        return (payload, headers)
 
 
-        CC_file_get = open(file_path, 'r')
-        results = CCHarvester(file_path, cc_config).gobble(CC_file_get)
-        CC_file_get.close()
-        os.remove(file_path)
+    def check_py(self, filename):
+        return True if match('.*\.py', filename) is not None else False
 
-        file_cc = 0
+    def calc_CC(self, raw_url):
 
-        for i in results:
-            print (i.complexity)
-            file_cc += int(i.complexity)
+        blob_url = raw_url.split('|')[0]
+        filename = raw_url.split('|')[1]
 
-        #avg_cc = file_cc/ len(results)
-        print("Complexity of file: " + str(file_cc))
-        #print("Average complexity of file: " + str(avg_cc))
-        return file_cc
-    else:
-        return -1
+        payload_headers = self.get__params_headers()
 
-def receive_work():
-    serverName = 'localhost'
-    serverPort = 2017 
+        flag = self.check_py(filename)
+        if flag == True:
 
-    CC_socket = socket(AF_INET, SOCK_STREAM)
-    CC_socket.connect((serverName,serverPort))
+            resp = requests.get(blob_url,   params=payload_headers[0], headers=payload_headers[1])
 
-    msg = "Ready|Worker1"
+            file_path = filename
 
-    CC_socket.send(msg.encode())
+            with open(file_path, 'w') as tmp_file:
+                tmp_file.write(resp.text)
+            tmp_file.close()
 
-    '''
-    CC_socket = socket(AF_INET, SOCK_STREAM)
-    serverName = 'localhost'
-    serverPort = 1598  
-    CC_socket.bind(('', serverPort))
-    CC_socket.listen(1)
-    '''
 
-    while True:
-        #connectionSocket, addr = CC_socket.accept()
-        raw_url = CC_socket.recv(1024)
-        raw_url = raw_url.decode()
+            CC_file_get = open(file_path, 'r')
+            results = CCHarvester(file_path, self.cc_config).gobble(CC_file_get)
+            CC_file_get.close()
+            os.remove(file_path)
 
-        print("RECEIVED: " + raw_url)
-        if raw_url != "":
-            file_cc = calc_CC(raw_url, cc_config)
-        
-            file_cc = str(file_cc)
-            CC_socket.send(file_cc.encode())
+            file_cc = 0
+
+            for i in results:
+                print (i.complexity)
+                file_cc += int(i.complexity)
+
+            #avg_cc = file_cc/ len(results)
+            print("Complexity of file: " + str(file_cc))
+            #print("Average complexity of file: " + str(avg_cc))
+            return file_cc
         else:
-            break
+            return -1
 
-    print("Terminating connection...")  
-    CC_socket.close()
+    def receive_work(self):
+
+        total_cc = 0
+        for blob_url in self.files_list_url:
+            print("Blob is: " + blob_url)
+
+            file_cc = self.calc_CC(blob_url)
+            total_cc += file_cc
+            print(str(file_cc))
+
+
+        print("Finished...") 
+        print("Total CC is " + str(total_cc)) 
 
 
 def main():
 
     print("Worker is ready to receive...")
-    receive_work()
+    worker = Worker()
+    print("URL list received...")
+    worker.receive_work()
 
 if __name__ == "__main__":
     main()
