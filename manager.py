@@ -95,7 +95,7 @@ def main():
     get_blob_url_list(github_url, tree_urls)    # get blob URLs of each tree's 
     print("Blob URL's received...")
     #print (raw_url_list)
-    app.run(host='localhost', port=2020, debug=True)
+    app.run(host='localhost', port=2020, debug=False)
 
 
 

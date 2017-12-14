@@ -28,7 +28,7 @@ class Worker():
     )
 
     def __init__(self):
-        self.blob_url = requests.get(self.master_url).json()
+        self.blob_url = requests.get(self.manager_url).json()
         print(self.blob_url)
 
     def get__params_headers(self):
@@ -86,16 +86,17 @@ class Worker():
 
         file_cc = self.calc_CC(self.blob_url)
         self.total_cc += file_cc
-        #print(str(file_cc))
 
-        self.blob_url = requests.get(self.master_url).json()
-        if self.blob_url != "finished":
-            self.receive_work()
-        else:
-            print("Finished...") 
-            print("Total CC: " + str(self.total_cc))
-            requests.put(self.master_url, data={'cc': self.total_cc})
+        self.blob_url = requests.get(self.manager_url).json()
+        while self.blob_url != "finished":
+            file_cc = self.calc_CC(self.blob_url)
+            self.total_cc += file_cc
+            self.blob_url = requests.get(self.manager_url).json()
 
+
+        print("Finished...") 
+        print("Total CC: " + str(self.total_cc))
+        requests.put(self.manager_url, data={'cc': self.total_cc})
 
 def main():
 
