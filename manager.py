@@ -5,9 +5,13 @@ import shutil
 from flask import Flask
 from flask_restful import Resource, Api, request
 import sys
+import time
 
 app = Flask(__name__)
 api = Api(app)
+
+t0 = time.clock()
+t1 = time.clock()
 
 blob_url_list = deque()
 new_cc = 0
@@ -30,6 +34,8 @@ class Master(Resource):
     def put(self):
         global total_cc
         global recv_count
+        global t0
+        global t1
 
         new_cc = int(request.form['cc'])
         total_cc += new_cc
@@ -41,6 +47,7 @@ class Master(Resource):
             ave_cc = total_cc / blob_list_length
             print("\nAverage CC: " + str(ave_cc))
             print("Total CC: " + str(total_cc) + "\n")   
+            
             kill_manager()
 
         return '', 204
@@ -112,8 +119,11 @@ def main():
     get_blob_url_list(github_url, tree_urls)    # get blob URLs of each tree's 
     print("Blob URL's received...")
 
+    t0 = time.clock()
     app.run(host='localhost', port=2020, debug=False)
-
+    t1 = time.clock()
+    total = t1 - t0
+    print("Total time taken was: " + str(total))
 
 api.add_resource(Master, '/')
 
