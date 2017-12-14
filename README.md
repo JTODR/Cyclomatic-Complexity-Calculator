@@ -9,8 +9,9 @@ It was written on a Windows Machine.
 
 To run this project, do the following:
 
+* **This is important! -** In GitHub, go to: Settings -> Developer Settings -> Personal access tokens -> Generate new token -> Enter password -> Generate token. Then copy the generated token to the clipboard. In the working directory of the manager and the worker, open a text file and name it 'github-token.txt'. Paste the generated token into this text file. The manager and worker will use this token to access the GitHub API.
+* Run the manager: **python manager.py**
 * Run the worker: **python worker.py**
-* Then, run the manager: **python manager.py**
 
 
 ## Project Overview
