@@ -8,8 +8,8 @@ from time import gmtime, strftime
 import os.path
 import sys
 import shutil
-
 from re import match
+from time import gmtime, strftime
 
 
 
@@ -29,7 +29,7 @@ class Worker():
 
     def __init__(self):
         self.blob_url = requests.get(self.manager_url).json()
-        print(self.blob_url)
+        #print(self.blob_url)
 
     def get__params_headers(self):
         with open('github-token.txt', 'r') as tmp_file:
@@ -57,7 +57,10 @@ class Worker():
 
             resp = requests.get(blob_url,   params=payload_headers[0], headers=payload_headers[1])
 
-            file_path = filename
+            file_path = strftime("%Y%m%d%H%M%S", gmtime())
+            script_name = os.path.basename(__file__)
+            script_name = script_name.split('.')[0]
+            file_path = script_name + file_path + '.py'
 
             with open(file_path, 'w') as tmp_file:
                 tmp_file.write(resp.text)
@@ -82,7 +85,7 @@ class Worker():
 
     def receive_work(self):
 
-        print("Blob is: " + self.blob_url)
+        #print("Blob is: " + self.blob_url)
 
         file_cc = self.calc_CC(self.blob_url)
         self.total_cc += file_cc

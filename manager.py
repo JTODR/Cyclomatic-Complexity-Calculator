@@ -4,19 +4,23 @@ from collections import deque
 import shutil
 from flask import Flask
 from flask_restful import Resource, Api, request
+import sys
 
 app = Flask(__name__)
 api = Api(app)
 
 blob_url_list = deque()
 new_cc = 0
-CC = 0
+total_cc = 0
 blob_list_length = 0
+recv_count = 0
+num_workers = sys.argv[1]
 
 class Master(Resource):
 
     def get(self):
         global blob_url_list
+
         if blob_url_list:
             return blob_url_list.popleft()
         else:
@@ -24,15 +28,30 @@ class Master(Resource):
 
 
     def put(self):
-        global CC
+        global total_cc
+        global recv_count
 
         new_cc = int(request.form['cc'])
+        total_cc += new_cc
 
         print("RECEIVED: " + str(new_cc))
-        ave_cc = new_cc / blob_list_length
-        print("Average CC: " + str(ave_cc))
+        recv_count += 1
+  
+        if recv_count == int(num_workers):
+            ave_cc = total_cc / blob_list_length
+            print("\nAverage CC: " + str(ave_cc))
+            print("Total CC: " + str(total_cc) + "\n")   
+            kill_manager()
+
         return '', 204
 
+
+def kill_manager():
+
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        raise RuntimeError('Not running with the Werkzeug Server')
+    func()
 
 def get_tree_urls(github_url):
     
@@ -76,27 +95,24 @@ def get__params_headers():
 
     payload = {'access_token': token}
     headers = {'Accept': 'application/vnd.github.v3.raw'}
-
-    #print(token)
     return (payload, headers)
 
 
 def main():
 
     print ("Manager started...")
-
     
     github_url = 'https://api.github.com/repos/JTODR/Cyclomatic-Complexity-Calculator/commits'
-   
+    
     print("Getting Tree URL list...")
     tree_urls = get_tree_urls(github_url)      # get the list of tree URL's from the project's commits
     print("Tree URL list received...")
+    
     print("Gettng blob URL's...")
     get_blob_url_list(github_url, tree_urls)    # get blob URLs of each tree's 
     print("Blob URL's received...")
-    #print (raw_url_list)
-    app.run(host='localhost', port=2020, debug=False)
 
+    app.run(host='localhost', port=2020, debug=False)
 
 
 api.add_resource(Master, '/')
