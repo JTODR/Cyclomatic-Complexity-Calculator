@@ -73,16 +73,27 @@ def calc_CC(raw_url, cc_config):
         return -1
 
 def receive_work():
+    serverName = 'localhost'
+    serverPort = 2017 
 
+    CC_socket = socket(AF_INET, SOCK_STREAM)
+    CC_socket.connect((serverName,serverPort))
+
+    msg = "Ready|Worker1"
+
+    CC_socket.send(msg.encode())
+
+    '''
     CC_socket = socket(AF_INET, SOCK_STREAM)
     serverName = 'localhost'
     serverPort = 1598  
     CC_socket.bind(('', serverPort))
     CC_socket.listen(1)
+    '''
 
     while True:
-        connectionSocket, addr = CC_socket.accept()
-        raw_url = connectionSocket.recv(1024)
+        #connectionSocket, addr = CC_socket.accept()
+        raw_url = CC_socket.recv(1024)
         raw_url = raw_url.decode()
 
         print("RECEIVED: " + raw_url)
@@ -90,9 +101,9 @@ def receive_work():
         file_cc = calc_CC(raw_url, cc_config)
         
         file_cc = str(file_cc)
-        connectionSocket.send(file_cc.encode())
+        CC_socket.send(file_cc.encode())
 
-    connectionSocket.close()
+    CC_socket.close()
 
 
 def main():
