@@ -14,9 +14,8 @@ from re import match
 
 
 class Worker():
-
-    master_url = 'http://localhost:2020/'
-    node_setup_url = 'http://localhost:2020/init'
+    total_cc = 0
+    manager_url = 'http://localhost:2020/'
 
     cc_config = Config(
             exclude='',
@@ -29,8 +28,8 @@ class Worker():
     )
 
     def __init__(self):
-        self.files_list_url = requests.get(self.master_url).json()
-        print(self.files_list_url)
+        self.blob_url = requests.get(self.master_url).json()
+        print(self.blob_url)
 
     def get__params_headers(self):
         with open('github-token.txt', 'r') as tmp_file:
@@ -73,30 +72,29 @@ class Worker():
             file_cc = 0
 
             for i in results:
-                print (i.complexity)
                 file_cc += int(i.complexity)
 
-            #avg_cc = file_cc/ len(results)
             print("Complexity of file: " + str(file_cc))
             #print("Average complexity of file: " + str(avg_cc))
             return file_cc
         else:
-            return -1
+            return 0
 
     def receive_work(self):
 
-        total_cc = 0
-        for blob_url in self.files_list_url:
-            print("Blob is: " + blob_url)
+        print("Blob is: " + self.blob_url)
 
-            file_cc = self.calc_CC(blob_url)
-            total_cc += file_cc
-            print(str(file_cc))
+        file_cc = self.calc_CC(self.blob_url)
+        self.total_cc += file_cc
+        #print(str(file_cc))
 
-
-        print("Finished...") 
-        print("Total CC is " + str(total_cc)) 
-        requests.put(self.master_url, data={'cc': total_cc})
+        self.blob_url = requests.get(self.master_url).json()
+        if self.blob_url != "finished":
+            self.receive_work()
+        else:
+            print("Finished...") 
+            print("Total CC: " + str(self.total_cc))
+            requests.put(self.master_url, data={'cc': self.total_cc})
 
 
 def main():
