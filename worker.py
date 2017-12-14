@@ -29,7 +29,7 @@ class Worker():
     )
 
     def __init__(self):
-        self.files_list_url = requests.get(self.master_url).json()#['url']
+        self.files_list_url = requests.get(self.master_url).json()
         print(self.files_list_url)
 
     def get__params_headers(self):
@@ -96,6 +96,7 @@ class Worker():
 
         print("Finished...") 
         print("Total CC is " + str(total_cc)) 
+        requests.put(self.master_url, data={'cc': total_cc})
 
 
 def main():

@@ -23,18 +23,14 @@ class Master(Resource):
     def put(self):
         global CC
 
-        new_cc = float(request.form['cc'])
+        new_cc = int(request.form['cc'])
 
-        CC += new_cc
+        print("RECEIVED: " + str(new_cc))
+        
+        
 
         return '', 204
 
-class NodeSetup(Resource):
-
-    def get(self):
-
-        print('New node joined')
-        return blob_url_list
 
 def get_tree_urls(github_url):
     
