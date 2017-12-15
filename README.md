@@ -11,8 +11,8 @@ Python's Flask, requests and radon modules are needed to run the manager and the
 To run this project, do the following:
 
 1. **This bit is important!** In GitHub, go to: Settings -> Developer Settings -> Personal access tokens -> Generate new token -> Enter password -> Generate token. Then copy the generated token to the clipboard. In the working directory of the manager and the worker, open a text file and name it 'github-token.txt'. Paste the generated token into this text file. The manager and worker will use this token to access the GitHub API.
-2. Run the manager: **python manager.py [number of workers]**
-3. Once the Manager's Flask server is running, run the run_workers.cmd script to start the workers: **run_workers.cmd [number of workers]**
+2. Run the manager: **python manager.py [number of workers]** (Max number of workers that can run is **10**)
+3. Once the Manager's Flask server is running, run the run_workers.cmd script to start the workers: **run_workers.cmd [number of workers]** (Max number of workers that can run is **10**)
 
 
 ## Project Overview
