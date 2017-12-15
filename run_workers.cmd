@@ -6,6 +6,8 @@ if %1%==5 goto worker5
 if %1%==6 goto worker6
 if %1%==7 goto worker7
 if %1%==8 goto worker8
+if %1%==9 goto worker9
+if %1%==10 goto worker10
 
 :worker1
     start cmd /c python worker.py
@@ -56,6 +58,31 @@ if %1%==8 goto worker8
     goto finished
     
 :worker8
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:worker9
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:worker10
+    start cmd /c python worker.py
+    start cmd /c python worker.py
     start cmd /c python worker.py
     start cmd /c python worker.py
     start cmd /c python worker.py

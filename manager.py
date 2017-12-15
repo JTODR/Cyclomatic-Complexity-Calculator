@@ -131,6 +131,12 @@ def main():
     total = t1 - t0
     print("Total time taken was: " + str(total) + " seconds")
 
+    time_str = "num_workers=" + str(num_workers) + ", time=" + str(total) + "sec\n"
+
+    with open("WorkerTime.txt", 'a+') as time_file:
+        time_file.write(time_str)
+    
+
 api.add_resource(Manager, '/')
 
 if __name__ == "__main__":

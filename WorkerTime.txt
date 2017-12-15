@@ -1,0 +1,10 @@
+num_workers=1, time=91.33141899739734sec
+num_workers=2, time=46.72438658813899sec
+num_workers=3, time=31.92699067497033sec
+num_workers=4, time=24.674478479424415sec
+num_workers=5, time=20.190593034593157sec
+num_workers=6, time=16.76860739270527sec
+num_workers=7, time=15.837902350299379sec
+num_workers=8, time=13.1174308207954sec
+num_workers=9, time=12.1239082477762sec
+num_workers=10, time=10.876919405890845sec
