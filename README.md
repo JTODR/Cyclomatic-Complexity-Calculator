@@ -32,3 +32,12 @@ The manager uses the github API to obtain files from the respository. It is give
 Upon reception of a blob URL the worker parses out the URL and the filename from the URL. It then checks if the file is a python file. If so, it uses python's requests module to retrieve the contents of the file. It then writes the contents to a temporary local file. It reads in this file and uses CCHarvester from python's radon module to determine the complexity of the file. This returns the complexity of each section of code in the file. The worker appends this to a total complexity for the file and sends the result back to the manager via the Flask server.
 
 The CCHarvester class is defined here: https://github.com/rubik/radon/blob/master/radon/cli/harvest.py
+
+
+----
+
+**Graph**
+
+Graph of time taken to calculate average cyclomatic complexity for all commits vs number of workers
+
+![alt text](https://github.com/JTODR/Cyclomatic-Complexity-Calculator/blob/master/graph.jpg "graph.jpg")
