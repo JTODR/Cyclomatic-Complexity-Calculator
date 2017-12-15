@@ -1,6 +1,69 @@
-start cmd /c python worker1.py
-start cmd /c python worker2.py
-start cmd /c python worker3.py
-start cmd /c python worker4.py
-start cmd /c python worker5.py
-start cmd /c python worker6.py
+if %1%==1 goto worker1
+if %1%==2 goto worker2
+if %1%==3 goto worker3
+if %1%==4 goto worker4
+if %1%==5 goto worker5
+if %1%==6 goto worker6
+if %1%==7 goto worker7
+if %1%==8 goto worker8
+
+:worker1
+    start cmd /c python worker.py
+    goto finished
+:worker2
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:worker3
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:worker4
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:worker5
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:worker6
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:worker7
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:worker8
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    start cmd /c python worker.py
+    goto finished
+    
+:finished

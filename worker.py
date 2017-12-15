@@ -10,12 +10,13 @@ import sys
 import shutil
 from re import match
 from time import gmtime, strftime
+import time
 
 
 
 class Worker():
     total_cc = 0
-    manager_url = 'http://localhost:2020/'
+    manager_url = 'http://localhost:2020/'      # url of the flask server
 
     cc_config = Config(
             exclude='',
@@ -28,8 +29,7 @@ class Worker():
     )
 
     def __init__(self):
-        self.blob_url = requests.get(self.manager_url).json()
-        #print(self.blob_url)
+        self.blob_url = requests.get(self.manager_url).json()   # get the first url
 
     def get__params_headers(self):
         with open('github-token.txt', 'r') as tmp_file:
@@ -45,22 +45,24 @@ class Worker():
     def check_py(self, filename):
         return True if match('.*\.py', filename) is not None else False
 
-    def calc_CC(self, raw_url):
+    def calc_CC(self, blob_url):
 
-        blob_url = raw_url.split('|')[0]
-        filename = raw_url.split('|')[1]
+        url = blob_url.split('|')[0]
+        filename = blob_url.split('|')[1]
 
         payload_headers = self.get__params_headers()
 
         flag = self.check_py(filename)
         if flag == True:
 
-            resp = requests.get(blob_url,   params=payload_headers[0], headers=payload_headers[1])
+            resp = requests.get(url,   params=payload_headers[0], headers=payload_headers[1])
 
-            file_path = strftime("%Y%m%d%H%M%S", gmtime())
-            script_name = os.path.basename(__file__)
-            script_name = script_name.split('.')[0]
-            file_path = script_name + file_path + '.py'
+            curr_time = time.clock()
+            curr_time = str(curr_time)
+            curr_time = curr_time.split('.')[1]
+            sha = url.split('/blobs/')[1]       # give the temp file a unique name (sha + current processor time)
+
+            file_path = sha + curr_time  + '.py'
 
             with open(file_path, 'w') as tmp_file:
                 tmp_file.write(resp.text)
@@ -78,14 +80,12 @@ class Worker():
                 file_cc += int(i.complexity)
 
             print("Complexity of file: " + str(file_cc))
-            #print("Average complexity of file: " + str(avg_cc))
+
             return file_cc
         else:
             return 0
 
     def receive_work(self):
-
-        #print("Blob is: " + self.blob_url)
 
         file_cc = self.calc_CC(self.blob_url)
         self.total_cc += file_cc
@@ -105,7 +105,6 @@ def main():
 
     print("Worker is ready to receive...")
     worker = Worker()
-    print("URL list received...")
     worker.receive_work()
 
 if __name__ == "__main__":

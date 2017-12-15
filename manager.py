@@ -14,18 +14,22 @@ t0 = time.clock()
 t1 = time.clock()
 
 blob_url_list = deque()
-new_cc = 0
+worker_cc = 0
 total_cc = 0
+avg_cc = 0
 blob_list_length = 0
 recv_count = 0
 num_workers = sys.argv[1]
 
-class Master(Resource):
+class Manager(Resource):
 
     def get(self):
         global blob_url_list
+        global t0
 
         if blob_url_list:
+            if blob_list_length-1 == len(blob_url_list):
+                t0 = time.clock()
             return blob_url_list.popleft()
         else:
             return "finished"
@@ -36,19 +40,17 @@ class Master(Resource):
         global recv_count
         global t0
         global t1
+        global ave_cc
 
-        new_cc = int(request.form['cc'])
-        total_cc += new_cc
+        worker_cc = int(request.form['cc'])
+        total_cc += worker_cc
 
-        print("RECEIVED: " + str(new_cc))
+        print("RECEIVED: " + str(worker_cc))
         recv_count += 1
   
         if recv_count == int(num_workers):
-            ave_cc = total_cc / blob_list_length
-            print("\nAverage CC: " + str(ave_cc))
-            print("Total CC: " + str(total_cc) + "\n")   
+            kill_manager()         
             
-            kill_manager()
 
         return '', 204
 
@@ -119,13 +121,17 @@ def main():
     get_blob_url_list(github_url, tree_urls)    # get blob URLs of each tree's 
     print("Blob URL's received...")
 
-    t0 = time.clock()
     app.run(host='localhost', port=2020, debug=False)
     t1 = time.clock()
-    total = t1 - t0
-    print("Total time taken was: " + str(total))
 
-api.add_resource(Master, '/')
+    ave_cc = total_cc / blob_list_length
+    print("\nAverage CC: " + str(ave_cc))
+    print("Total CC: " + str(total_cc) + "\n")
+
+    total = t1 - t0
+    print("Total time taken was: " + str(total) + " seconds")
+
+api.add_resource(Manager, '/')
 
 if __name__ == "__main__":
     main()
